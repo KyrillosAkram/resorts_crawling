@@ -77,6 +77,22 @@ page=driver.page_source
 page=BeautifulSoup(page,'lxml')
 resorts=[h.get_text for h in page.findAll('h3',{'class':'pwa-theme--grey-900 truncate all-b-padding-half uitk-type-heading-500','aria-hidden':'true'})]
 resorts=resorts[:num_resorts]
+ratings=page.findAll('span',{'class':'uitk-type-300 uitk-type-bold all-r-padding-one'},limit=num_resorts)
+ratings=ratings[:num_resorts]
+ratings=[tag.get_text().strip.replace('/5','') for tag in ratings]
+price_without_off=page.findAll('div',{'class':'uitk-grid all-grid-align-middle all-grid-align-end'},limit=num_resorts)
+price_without_off=[ tag.findChild('span',{'class':'content-hotel-strikeout-price--a11y'}).get_text().replace('$','') if tag.a else 'not available' for tag in price]
+price_with_off   =page.findaAll('span',{'class':'uitk-cell uitk-type-600 uitk-type-bold all-cell-shrink'},limit=num_resorts)
+price_with_off   =[tag.get_text().replace('$','') for tag in price_with_off]
+
+#span#uitk-type-300 uitk-type-bold all-r-padding-one '''review rating'''
+#div#uitk-grid all-grid-align-middle all-grid-align-end '''prices conter'''.a    if found   .get_text()
+#span#uitk-cell uitk-type-600 uitk-type-bold all-cell-shrink '''after off price'''
+
+#### finding the site for each resort
+
+
+
 
 ##############################################################################################
 
