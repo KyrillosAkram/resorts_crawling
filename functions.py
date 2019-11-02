@@ -8,7 +8,7 @@ def fetch_results(search_term, number_results, language_code='en'):
 	google_url = 'https://www.google.com/search?q={}&num={}&hl={}'.format(escaped_search_term, number_results, language_code)
 	response = requests.get(google_url, headers=USER_AGENT)
 	response.raise_for_status()
-	return search_term, response.text
+	return response.text
 
 def average(lst):
     avr=0

@@ -89,7 +89,26 @@ price_with_off   =[tag.get_text().replace('$','') for tag in price_with_off]
 #div#uitk-grid all-grid-align-middle all-grid-align-end '''prices conter'''.a    if found   .get_text()
 #span#uitk-cell uitk-type-600 uitk-type-bold all-cell-shrink '''after off price'''
 
-#### finding the site for each resort
+#### loop for finding the site and email of each resort
+for resort in resorts:
+    # looking for the website
+    ## frist googling for this website
+    search_page         =fetch_results(resort +' website',10,'en')
+    search_page         =BeautifulSoup(search_page,'lxml')
+    sites_in_results    =search_page.findAll('div',{'class':'r'})
+    sites_in_results    =[tag.a['href'] for tag in sites_in_results]
+    resort_site         =desired_link(sites_in_results,resort)
+
+    # looking for email
+    ## frist googling for email
+    search_page         =fetch_results(resort+' email',10,'en')
+    emails_in_results   =re.findall(email_pattern,search_page)
+    
+    if len(email_pattern)==0 :
+        print()
+    
+    
+    else:
 
 
 
