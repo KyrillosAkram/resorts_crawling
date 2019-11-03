@@ -90,6 +90,7 @@ price_with_off   =[tag.get_text().replace('$','') for tag in price_with_off]
 #span#uitk-cell uitk-type-600 uitk-type-bold all-cell-shrink '''after off price'''
 
 #### loop for finding the site and email of each resort
+loop_counter=1
 for resort in resorts:
     # looking for the website
     ## frist googling for this website
@@ -104,26 +105,48 @@ for resort in resorts:
     search_page         =fetch_results(resort+' email',10,'en')
     emails_in_results   =re.findall(email_pattern,search_page)
     
-    if len(email_pattern)==0 :
+    if len(emails_in_results)==0 :
         print()
-    
-    
+        driver.get(resort_site)
+        sleep(1)
+        search_page=driver.page_source
+        emails_in_results=search_page.findall(email_pattern)
+        if(len(emails_in_results)==0):
+            search_page=BeautifulSoup(search_page,'lxml')
+            contact_us=search_page.findAll('a')
+            contact_us=[tag['href'] for tag in contact_us]
+            contact_us=desired_link(contact_us,'contact us')
+            driver.get(contact_us)
+            emails_in_results=search_page.findall(email_pattern)
+            if(len(emails_in_results)==0):
+                resort_email='not available'
+            else:
+                resort_email=desired_link(emails_in_results,'info '+resort)
+        else:
+            resort_email=desired_link(emails_in_results,'info '+resort)
     else:
-
+        resort_email=desired_link(emails_in_results,'info '+resort)
+    data.append([loop_counter,resort,ratings[loop_counter-1],price_with_off[loop_counter-1],price_without_off[loop_counter-1],resort_site,resort_email])
+    
+    
 
 
 
 ##############################################################################################
 
+
+################################''' saving data in google sheet '''#################################
+
 creds = ServiceAccountCredentials.from_json_keyfile_name("resorts_creds", scope)
 client = gspread.authorize(creds)
 sheet = client.open("testSheet").sheet1  # Open the spreadhseet
 data =[]
-data.append(data_header)
-sheet.append_row(insertRow,value_input_option='RAW')  # Insert the list as a row at index 4
+data.insert(0,data_header)
+for i in range(len(data)):
+    sheet.append_row(data[i],value_input_option='RAW')  # Insert the list as a row at index 4
 
 numRows = sheet.row_count  #
-
+####################################################################################################
 
 
 ################################''' functions '''#################################
